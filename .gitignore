@@ -9,7 +9,7 @@ npm-debug.log*
 auditLogUI.iml
 
 # Dependency directories
-client/node_modules/
+node_modules/
 
 # Build
 dist/
