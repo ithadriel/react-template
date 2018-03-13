@@ -1,0 +1,66 @@
+apply plugin: 'java'
+
+
+version = '1.0'
+archivesBaseName = 'template'
+
+buildscript {
+
+    ext {
+        springBootVersion = '1.5.9.RELEASE'
+        appName = 'templateI'
+    }
+    repositories {
+        maven {
+        }
+    }
+    dependencies {
+    }
+}
+
+repositories {
+    maven {
+    }
+}
+
+task dist(type: Zip) {
+    from projectDir
+    include 'dist/*', 'Staticfile'
+}
+
+// Versioning Configuration
+if (System.getenv('SOURCE_BUILD_NUMBER')) {
+    version = "${version}.${System.getenv('SOURCE_BUILD_NUMBER')}"
+} else if (System.getenv("BUILD_NUMBER")) {
+    version = "${version}.${System.getenv('BUILD_NUMBER')}"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.4.1'
+}
+
+task start(type: Exec) {
+    commandLine "npm", "start"
+}
+
+task buildStaticContent(type: Exec) {
+    commandLine "npm", "run-script", "bundle"
+}
+
+task deployStaticContent(type: Exec) {
+    commandLine "npm", "run-script", "deploy"
+}
+
+task cleanStaticContent(type: Exec) {
+    commandLine "npm", "run-script", "clean"
+}
+
+task clientTest(type: Exec) {
+    commandLine "npm", "run-script", "saveTestResults"
+}
+
+clientTest.dependsOn buildStaticContent
+deployStaticContent.dependsOn clientTest
+build.dependsOn deployStaticContent
+
+clean.dependsOn cleanStaticContent
